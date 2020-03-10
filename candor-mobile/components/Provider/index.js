@@ -1,0 +1,43 @@
+import React from 'react'
+
+import Context, { initialState } from '../../lib/context'
+import { firebase } from '../../lib/firebase'
+
+/**
+ * This component is the Context Provider using the new React Context API that
+ * gives the app store state
+ * https://blog.bitsrc.io/react-context-api-a-replacement-for-redux-6e20790492b3
+ */
+class Provider extends React.Component {
+  state = initialState
+
+  setCurrentUser = (currentUser) => {
+    this.setState({ currentUser })
+  }
+
+  signOut = async () => {
+    await firebase.auth().signOut()
+    this.setState({ ...initialState })
+  }
+
+  set = (key, value) => {
+    this.setState({ [key]: value })
+  }
+
+  render () {
+    return (
+      <Context.Provider
+        value={{
+          // NOTE any actions defined in this component must be added to the value here as well
+          ...this.state,
+          setCurrentUser: this.setCurrentUser,
+          signOut: this.signOut,
+          set: this.set
+        }}>
+        {this.props.children}
+      </Context.Provider>
+    )
+  }
+}
+
+export default Provider
